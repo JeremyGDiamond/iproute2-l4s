@@ -37,6 +37,8 @@
 #include "utils.h"
 #include "tc_util.h"
 
+#include "json_writer.h"
+
 #define MAX_PROB ((uint32_t)(~((uint32_t)0)))
 #define DEFAULT_ALPHA_BETA ((uint32_t)(~((uint32_t)0)))
 #define ALPHA_BETA_MAX ((2 << 23) - 1) /* see net/sched/sch_dualpi2.c */
@@ -362,79 +364,102 @@ static int dualpi2_print_opt(struct qdisc_util *qu, FILE *f, struct rtattr *opt)
 
 	parse_rtattr_nested(tb, TCA_DUALPI2_MAX, opt);
 
+	open_json_object(NULL);
+
 	if (tb[TCA_DUALPI2_LIMIT] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_LIMIT]) >= sizeof(__uint32_t))
-		fprintf(f, "limit %up ",
+		print_uint(PRINT_ANY, "limit", "limit %up ",
 			rta_getattr_u32(tb[TCA_DUALPI2_LIMIT]));
+
 	if (tb[TCA_DUALPI2_TARGET] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_TARGET]) >= sizeof(__uint32_t)) {
 		target = rta_getattr_u32(tb[TCA_DUALPI2_TARGET]);
-		fprintf(f, "target %s ", sprint_time(target, b1));
+		print_string(PRINT_ANY, "target", "target %s ",
+			sprint_time(target, b1));
 	}
+
 	if (tb[TCA_DUALPI2_TUPDATE] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_TUPDATE]) >= sizeof(__uint32_t)) {
 		tupdate = rta_getattr_u32(tb[TCA_DUALPI2_TUPDATE]);
-		fprintf(f, "tupdate %s ", sprint_time(tupdate, b1));
+		print_string(PRINT_ANY, "tupdate", "tupdate %s ",
+			sprint_time(tupdate, b1));
 	}
+
 	if (tb[TCA_DUALPI2_ALPHA] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_ALPHA]) >= sizeof(__uint32_t)) {
-		fprintf(f, "alpha %f ",
-			((float)rta_getattr_u32(tb[TCA_DUALPI2_ALPHA])) /
-			ALPHA_BETA_SCALE);
+			print_float(PRINT_ANY, "alpha", "alpha %.6f ",
+			    rta_getattr_u32(tb[TCA_DUALPI2_ALPHA]) /
+			    (float)ALPHA_BETA_SCALE);
 	}
+
 	if (tb[TCA_DUALPI2_BETA] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_BETA]) >= sizeof(__uint32_t)) {
-		fprintf(f, "beta %f ",
-			((float)rta_getattr_u32(tb[TCA_DUALPI2_BETA])) /
-			ALPHA_BETA_SCALE);
+			print_float(PRINT_ANY, "beta", "beta %.6f ",
+			    rta_getattr_u32(tb[TCA_DUALPI2_BETA]) /
+			    (float)ALPHA_BETA_SCALE);
 	}
+
 	if (tb[TCA_DUALPI2_ECN_MASK] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_ECN_MASK]) >= sizeof(__u8))
-		fprintf(f, "%s ",
+		print_string(PRINT_ANY, "ect_mode", "%s ",
 			get_ecn_type(rta_getattr_u8(tb[TCA_DUALPI2_ECN_MASK])));
+
 	if (tb[TCA_DUALPI2_COUPLING] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_COUPLING]) >= sizeof(__u8))
-		fprintf(f, "coupling_factor %u ",
+		print_uint(PRINT_ANY, "coupling_factor", "coupling_factor %u ",
 			rta_getattr_u8(tb[TCA_DUALPI2_COUPLING]));
+	
 	if (tb[TCA_DUALPI2_DROP_OVERLOAD] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_DROP_OVERLOAD]) >= sizeof(__u8)) {
-		if (rta_getattr_u8(tb[TCA_DUALPI2_DROP_OVERLOAD]))
-			fprintf(f, "drop_on_overload ");
-		else
-			fprintf(f, "overflow ");
+			if (rta_getattr_u8(tb[TCA_DUALPI2_DROP_OVERLOAD])){
+				print_string(PRINT_ANY, "drop_overload_mode", "%s ", "drop_on_overload");
+			}
+			else{
+				print_string(PRINT_ANY, "drop_overload_mode", "%s ", "overflow");
+			}
+
 	}
+
 	if (tb[TCA_DUALPI2_STEP_PACKETS] &&
             RTA_PAYLOAD(tb[TCA_DUALPI2_STEP_PACKETS]) >= sizeof(__u8) &&
 	    rta_getattr_u8(tb[TCA_DUALPI2_STEP_PACKETS]))
                         step_packets = true;
+
 	if (tb[TCA_DUALPI2_STEP_THRESH] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_STEP_THRESH]) >= sizeof(__uint32_t)) {
 		step_thresh = rta_getattr_u32(tb[TCA_DUALPI2_STEP_THRESH]);
 		if (step_packets)
-			fprintf(f, "step_thresh %upkt ", step_thresh);
+			print_uint(PRINT_ANY, "step_thresh", "step_thresh %upkt ", step_thresh);
 		else
-			fprintf(f, "step_thresh %s ",
+			print_string(PRINT_ANY, "step_thresh", "step_thresh %s ",
 				sprint_time(step_thresh, b1));
 	}
+
 	if (tb[TCA_DUALPI2_DROP_EARLY] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_DROP_EARLY]) >= sizeof(__u8)) {
-		if (rta_getattr_u8(tb[TCA_DUALPI2_DROP_EARLY]))
-			fprintf(f, "drop_enqueue ");
-		else
-			fprintf(f, "drop_dequeue ");
+			if (rta_getattr_u8(tb[TCA_DUALPI2_DROP_EARLY])) {
+				print_string(PRINT_ANY, "drop_position", "%s ", "drop_enqueue");
+			} else {
+				print_string(PRINT_ANY, "drop_position", "%s ", "drop_dequeue");
+			}
 	}
+
 	if (tb[TCA_DUALPI2_SPLIT_GSO] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_SPLIT_GSO]) >= sizeof(__u8)) {
-		if (rta_getattr_u8(tb[TCA_DUALPI2_SPLIT_GSO]))
-			fprintf(f, "split_gso ");
-		else
-			fprintf(f, "no_split_gso ");
+			if (rta_getattr_u8(tb[TCA_DUALPI2_SPLIT_GSO])) {
+				print_string(PRINT_ANY, "split_gso_mode", "%s ", "split_gso");
+			} else {
+				print_string(PRINT_ANY, "split_gso_mode", "%s ", "no_split_gso");
+			}
 	}
+
 	if (tb[TCA_DUALPI2_C_PROTECTION] &&
             RTA_PAYLOAD(tb[TCA_DUALPI2_C_PROTECTION]) >= sizeof(__u8))
-                fprintf(f, "classic_protection %u%% ",
-			rta_getattr_u8(tb[TCA_DUALPI2_C_PROTECTION]));
+			print_uint(PRINT_ANY, "classic_protection", "classic_protection %u%% ",
+				rta_getattr_u8(tb[TCA_DUALPI2_C_PROTECTION]));
 
+	close_json_object();
+	
 	return 0;
 }
 
@@ -449,13 +474,30 @@ static int dualpi2_print_xstats(struct qdisc_util *qu, FILE *f,
 	if (RTA_PAYLOAD(xstats) < sizeof(*st))
 		return -1;
 
+	open_json_object(NULL);
+
 	st = RTA_DATA(xstats);
-	fprintf(f, "prob %f delay_c %uus delay_l %uus\n",
-		(double)st->prob / (double)MAX_PROB, st->delay_c, st->delay_l);
-	fprintf(f, "pkts_in_c %u pkts_in_l %u maxq %u\n",
-		st->packets_in_c, st->packets_in_l, st->maxq);
-	fprintf(f, "ecn_mark %u step_marks %u\n", st->ecn_mark, st->step_marks);
-	fprintf(f, "credit %d (%c)\n", st->credit, st->credit > 0 ? 'C' : 'L');
+
+	// looks silly but stops a warning and saves a byte compared to a string wrap
+	char credit_owner_char[1]; 
+	credit_owner_char[0] = st->credit > 0 ? 'C' : 'L';
+	
+	print_float(PRINT_ANY, "prob", "%f ", (double)st->prob / MAX_PROB);
+	print_uint(PRINT_ANY, "delay_c", "%uus ", st->delay_c);
+	print_uint(PRINT_ANY, "delay_l", "%uus ", st->delay_l);
+
+	print_uint(PRINT_ANY, "pkts_in_c", "%u ", st->packets_in_c);
+	print_uint(PRINT_ANY, "pkts_in_l", "%u ", st->packets_in_l);
+	print_uint(PRINT_ANY, "maxq", "%u ", st->maxq);
+
+	print_uint(PRINT_ANY, "ecn_mark", "%u ", st->ecn_mark);
+	print_uint(PRINT_ANY, "step_marks", "%u ", st->step_marks);
+
+	print_int(PRINT_ANY, "credit", "%d ", st->credit);
+	print_string(PRINT_ANY, "credit_owner", "(%c)\n", credit_owner_char);
+	
+
+	close_json_object();
 	return 0;
 
 }
