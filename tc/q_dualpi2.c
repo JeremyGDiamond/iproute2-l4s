@@ -364,7 +364,7 @@ static int dualpi2_print_opt(struct qdisc_util *qu, FILE *f, struct rtattr *opt)
 
 	parse_rtattr_nested(tb, TCA_DUALPI2_MAX, opt);
 
-	open_json_object(NULL);
+	open_json_object("options");
 
 	if (tb[TCA_DUALPI2_LIMIT] &&
 	    RTA_PAYLOAD(tb[TCA_DUALPI2_LIMIT]) >= sizeof(__uint32_t))
@@ -474,7 +474,7 @@ static int dualpi2_print_xstats(struct qdisc_util *qu, FILE *f,
 	if (RTA_PAYLOAD(xstats) < sizeof(*st))
 		return -1;
 
-	open_json_object(NULL);
+	open_json_object("stats");
 
 	st = RTA_DATA(xstats);
 
