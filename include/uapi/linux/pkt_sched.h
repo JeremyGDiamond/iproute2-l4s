@@ -1295,6 +1295,9 @@ struct tc_dualpi2_xstats {
 	__u32 maxq;             /* maximum queue size */
 	__u32 ecn_mark;         /* packets marked with ecn*/
 	__u32 step_marks;	/* ECN marks due to the step AQM */
+	__u32 mice; /*num of mice flows*/
+	__u32 elephants; /*num of elephant flows*/
+	__u32 flow_map_coll;/*Hashmap of flows coll rate*/
 };
 
 #endif
