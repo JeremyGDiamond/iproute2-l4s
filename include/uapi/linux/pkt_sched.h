@@ -1298,6 +1298,8 @@ struct tc_dualpi2_xstats {
 	__u32 mice; /*num of mice flows*/
 	__u32 elephants; /*num of elephant flows*/
 	__u32 flow_map_coll;/*Hashmap of flows coll rate*/
+	__u32 l4s_q_backlog;
+	__u32 cla_q_backlog;
 };
 
 #endif

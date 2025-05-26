@@ -497,6 +497,9 @@ static int dualpi2_print_xstats(struct qdisc_util *qu, FILE *f,
 	print_uint(PRINT_ANY, "elephants", "%u ", st->elephants);
 	print_uint(PRINT_ANY, "flow_map_coll", "%u ", st->flow_map_coll);
 
+	print_uint(PRINT_ANY, "l4s_q_backlog", "%u ", st->l4s_q_backlog);
+	print_uint(PRINT_ANY, "cla_q_backlog", "%u ", st->cla_q_backlog);
+
 	print_int(PRINT_ANY, "credit", "%d ", st->credit);
 	print_string(PRINT_ANY, "credit_owner", "(%c)\n", credit_owner_char);
 	
