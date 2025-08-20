@@ -488,6 +488,10 @@ static int dualpi2_print_xstats(struct qdisc_util *qu, FILE *f,
 
 	print_uint(PRINT_ANY, "pkts_in_c", "%u ", st->packets_in_c);
 	print_uint(PRINT_ANY, "pkts_in_l", "%u ", st->packets_in_l);
+	print_uint(PRINT_ANY, "pkts_in_m", "%u ", st->packets_in_m);
+	print_uint(PRINT_ANY, "bytes_sent_c", "%u ", st->bytes_sent_c);
+	print_uint(PRINT_ANY, "bytes_sent_l", "%u ", st->bytes_sent_l);
+	print_uint(PRINT_ANY, "bytes_sent_m", "%u ", st->bytes_sent_m);
 	print_uint(PRINT_ANY, "maxq", "%u ", st->maxq);
 
 	print_uint(PRINT_ANY, "ecn_mark", "%u ", st->ecn_mark);
@@ -499,6 +503,7 @@ static int dualpi2_print_xstats(struct qdisc_util *qu, FILE *f,
 
 	print_uint(PRINT_ANY, "l4s_q_backlog", "%u ", st->l4s_q_backlog);
 	print_uint(PRINT_ANY, "cla_q_backlog", "%u ", st->cla_q_backlog);
+	print_uint(PRINT_ANY, "mice_q_backlog", "%u ", st->mice_q_backlog);
 
 	print_int(PRINT_ANY, "credit", "%d ", st->credit);
 	print_string(PRINT_ANY, "credit_owner", "(%c)\n", credit_owner_char);

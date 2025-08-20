@@ -1292,6 +1292,10 @@ struct tc_dualpi2_xstats {
 	__s32 credit;		/* current c_protection credit */
 	__u32 packets_in_c;	/* number of packets enqueued in C queue */
 	__u32 packets_in_l;	/* number of packets enqueued in L queue */
+	__u32 packets_in_m;	/* number of packets enqueued in m queue */
+	__u32 bytes_sent_c;	/* number of bytes sent from C queue */
+	__u32 bytes_sent_l;	/* number of bytes sent from L queue */
+	__u32 bytes_sent_m;	/* number of bytes sent from m queue */
 	__u32 maxq;             /* maximum queue size */
 	__u32 ecn_mark;         /* packets marked with ecn*/
 	__u32 step_marks;	/* ECN marks due to the step AQM */
@@ -1300,6 +1304,7 @@ struct tc_dualpi2_xstats {
 	__u32 flow_map_coll;/*Hashmap of flows coll rate*/
 	__u32 l4s_q_backlog;
 	__u32 cla_q_backlog;
+	__u32 mice_q_backlog;
 };
 
 #endif
